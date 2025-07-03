@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             TaskListAppTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-
+                    TaskListApp()
                 }
             }
         }
