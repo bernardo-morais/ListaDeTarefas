@@ -3,6 +3,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -62,12 +64,40 @@ fun TaskListApp() {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
-                if (taskText.text.isNotBlank()) { // Só adiciona se não estiver vazio
-                    taskList = taskList + Task(taskText.text) // Adiciona tarefa nova
-                    taskText = TextFieldValue("") // Limpa o input
+                if (taskText.text.isNotBlank()) {
+                    taskList = taskList + Task(taskText.text)
+                    taskText = TextFieldValue("")
                 }
             }) {
                 Text("Adicionar")
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyColumn {
+            items(taskList) { task ->
+                TaskItem(
+                    task = task,
+                    onToggle = {
+                        taskList = taskList.map {
+                            if (it == task) it.copy(isDone = !it.isDone) else it
+                        }.filter { !(autoDeleteDone && it.isDone) }
+                    },
+                    onRemove = {
+                        taskList = taskList - task
+                    },
+                    onEdit = {
+                        editingTask = task
+                    },
+                    isEditing = (editingTask == task),
+                    onDetailsChange = { newDetails ->
+                        task.details = newDetails
+                        taskList = taskList.toList()
+                    },
+                    onDoneEditing = {
+                        editingTask = null
+                    }
+                )
             }
         }
     }
