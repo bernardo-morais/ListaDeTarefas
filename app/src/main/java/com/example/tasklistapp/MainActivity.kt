@@ -3,15 +3,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.tasklistapp.ui.theme.TaskListAppTheme
+import androidx.compose.ui.unit.sp
 
 
 data class Task(
@@ -113,5 +116,42 @@ fun TaskItem(
     onDetailsChange: (String) -> Unit,
     onDoneEditing: () -> Unit
 ) {
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
 
+    ){
+        Row (
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ){
+            Checkbox(
+                checked = task.isDone,
+                onCheckedChange = { onToggle() }
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Título da tarefa, clicável para editar detalhes
+            Text(
+                text = task.title,
+                color = if (task.isDone) Color.Gray else Color.Black,
+                fontSize = 22.sp,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { onEdit() }
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+
+            Text(
+                text = "🗑",
+                modifier = Modifier
+                    .clickable { onRemove() }
+            )
+
+        }
+    }
 }
