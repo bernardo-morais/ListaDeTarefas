@@ -13,6 +13,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.tasklistapp.ui.theme.TaskListAppTheme
 
+
 data class Task(
     val title: String,
     var isDone: Boolean = false,
@@ -101,4 +102,16 @@ fun TaskListApp() {
             }
         }
     }
+}
+@Composable
+fun TaskItem(
+    task: Task,
+    onToggle: () -> Unit,
+    onRemove: () -> Unit,
+    onEdit: () -> Unit,
+    isEditing: Boolean,
+    onDetailsChange: (String) -> Unit,
+    onDoneEditing: () -> Unit
+) {
+
 }
