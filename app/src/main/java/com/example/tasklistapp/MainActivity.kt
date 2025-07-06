@@ -133,7 +133,6 @@ fun TaskItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Título da tarefa, clicável para editar detalhes
             Text(
                 text = task.title,
                 color = if (task.isDone) Color.Gray else Color.Black,
@@ -145,13 +144,44 @@ fun TaskItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-
             Text(
                 text = "🗑",
                 modifier = Modifier
                     .clickable { onRemove() }
             )
+        }
+        if (isEditing) {
+            var tempDetails by remember { mutableStateOf(task.details) }
 
+            TextField(
+                value = tempDetails,
+                onValueChange = {
+                    tempDetails = it
+                    onDetailsChange(it) // Atualiza detalhes no estado
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                placeholder = { Text("Adicione detalhes à tarefa...") }
+            )
+
+            Button(
+                onClick = onDoneEditing,
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .align(Alignment.End)
+            ) {
+                Text("Fechar")
+            }
+        } else if (task.details.isNotBlank()) {
+
+            Text(
+                text = "📝 ${task.details}",
+                color = Color.DarkGray,
+                fontSize = 19.sp,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 48.dp, top = 4.dp)
+            )
         }
     }
 }
