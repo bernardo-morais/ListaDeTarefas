@@ -16,20 +16,21 @@ import androidx.compose.ui.unit.dp
 import com.example.tasklistapp.ui.theme.TaskListAppTheme
 import androidx.compose.ui.unit.sp
 
-
+// Modelo de dados para uma tarefa
 data class Task(
     val title: String,
     var isDone: Boolean = false,
     var details: String = ""
 )
 
+// Activity principal que cria a UI utilizando o Compose
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TaskListAppTheme {
+            TaskListAppTheme { // Aplica o tema
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    TaskListApp()
+                    TaskListApp() // Componente principal da app
                 }
             }
         }
@@ -38,9 +39,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TaskListApp() {
 
+    // Estado para o texto da nova tarefa
     var taskText by remember { mutableStateOf(TextFieldValue("")) }
+    // Estado para a lista de tarefas
     var taskList by remember { mutableStateOf(listOf<Task>()) }
+    // Estado para a tarefa que está a ser editada (se houver)
     var editingTask by remember { mutableStateOf<Task?>(null) }
+    // Estado para o switch de apagar tarefas feitas automaticamente
     var autoDeleteDone by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier
@@ -50,6 +55,7 @@ fun TaskListApp() {
         Text(text = "📝 Minha To-Do List", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Linha com o switch para ativar/desativar apagar automático
         Row(verticalAlignment = Alignment.CenterVertically) {
             Switch(
                 checked = autoDeleteDone,
@@ -59,6 +65,7 @@ fun TaskListApp() {
             Text("Apagar tarefas automaticamente ao concluir")
         }
 
+        // Linha para input de nova tarefa e botão adicionar
         Row(modifier = Modifier.fillMaxWidth()) {
             TextField(
                 value = taskText,
@@ -68,7 +75,7 @@ fun TaskListApp() {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Button(onClick = {
-                if (taskText.text.isNotBlank()) {
+                if (taskText.text.isNotBlank()) { // Só adiciona se não estiver vazio
                     taskList = taskList + Task(taskText.text)
                     taskText = TextFieldValue("")
                 }
@@ -78,28 +85,30 @@ fun TaskListApp() {
         }
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Lista de tarefas com LazyColumn (scroll)
         LazyColumn {
             items(taskList) { task ->
                 TaskItem(
                     task = task,
                     onToggle = {
+                        // Alterna isDone e remove se autoDeleteDone está ativo
                         taskList = taskList.map {
                             if (it == task) it.copy(isDone = !it.isDone) else it
                         }.filter { !(autoDeleteDone && it.isDone) }
                     },
                     onRemove = {
-                        taskList = taskList - task
+                        taskList = taskList - task // Remove a tarefa
                     },
                     onEdit = {
-                        editingTask = task
+                        editingTask = task // Define tarefa para editar detalhes
                     },
-                    isEditing = (editingTask == task),
+                    isEditing = (editingTask == task),// Se esta tarefa está a ser editada
                     onDetailsChange = { newDetails ->
-                        task.details = newDetails
-                        taskList = taskList.toList()
+                        task.details = newDetails // Atualiza os detalhes da tarefa
+                        taskList = taskList.toList() // Força recomposição
                     },
                     onDoneEditing = {
-                        editingTask = null
+                        editingTask = null // Sai do modo de edição
                     }
                 )
             }
@@ -109,7 +118,7 @@ fun TaskListApp() {
 @Composable
 fun TaskItem(
     task: Task,
-    onToggle: () -> Unit,
+    onToggle: () -> Unit, //função sem argumento e sem retorno
     onRemove: () -> Unit,
     onEdit: () -> Unit,
     isEditing: Boolean,
@@ -126,6 +135,7 @@ fun TaskItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ){
+            // Checkbox para marcar a tarefa como concluída
             Checkbox(
                 checked = task.isDone,
                 onCheckedChange = { onToggle() }
@@ -133,6 +143,7 @@ fun TaskItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
+            // Título da tarefa, clicável para editar detalhes
             Text(
                 text = task.title,
                 color = if (task.isDone) Color.Gray else Color.Black,
@@ -144,12 +155,14 @@ fun TaskItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
+            // Ícone de remover tarefa
             Text(
                 text = "🗑",
                 modifier = Modifier
                     .clickable { onRemove() }
             )
         }
+        // Se estiver a editar, mostra campo para detalhes e botão fechar
         if (isEditing) {
             var tempDetails by remember { mutableStateOf(task.details) }
 
@@ -175,6 +188,7 @@ fun TaskItem(
             }
         } else if (task.details.isNotBlank()) {
 
+            // Mostra detalhes da tarefa (se existirem) quando não está em edição
             Text(
                 text = "📝 ${task.details}",
                 color = Color.DarkGray,
